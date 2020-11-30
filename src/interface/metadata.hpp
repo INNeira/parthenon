@@ -154,30 +154,12 @@ class Metadata {
 #undef PARTHENON_INTERNAL_FOR_FLAG
 
   /// Default constructor override
-  Metadata() : shape_({1}), sparse_id_(-1) {}
-
-  /// returns a new Metadata instance with set bits,
-  /// set sparse_id, and fourth dimension
-  explicit Metadata(const std::vector<MetadataFlag> &bits) : shape_({1}), sparse_id_(-1) {
-    SetMultiple(bits);
-  }
+  Metadata() = default;
 
   /// returns a metadata with bits and shape set
-  explicit Metadata(const std::vector<MetadataFlag> &bits, std::vector<int> shape)
-      : shape_(shape), sparse_id_(-1) {
-    SetMultiple(bits);
-  }
-
-  /// returns a metadata with bits and sparse id set
-  explicit Metadata(const std::vector<MetadataFlag> &bits, const int sparse_id)
-      : shape_({1}), sparse_id_(sparse_id) {
-    SetMultiple(bits);
-  }
-
-  /// returns a metadata with bits, shape, and sparse ID set
-  explicit Metadata(const std::vector<MetadataFlag> &bits, int sparse_id,
-                    std::vector<int> shape)
-      : shape_(shape), sparse_id_(sparse_id) {
+  explicit Metadata(const std::vector<MetadataFlag> &bits,
+                    std::vector<int> const &shape = {})
+      : shape_(shape) {
     SetMultiple(bits);
   }
 
@@ -216,9 +198,6 @@ class Metadata {
     /// by default return Metadata::None
     return None;
   }
-
-  void SetSparseId(int id) { sparse_id_ = id; }
-  int GetSparseId() const { return sparse_id_; }
 
   const std::vector<int> &Shape() const { return shape_; }
 
@@ -277,7 +256,7 @@ class Metadata {
       }
     }
 
-    return std::tie(a.shape_, a.sparse_id_) == std::tie(b.shape_, b.sparse_id_);
+    return a.shape_ == b.shape_;
   }
 
   bool operator!=(const Metadata &b) const { return !(*this == b); }
@@ -288,9 +267,8 @@ class Metadata {
  private:
   /// the attribute flags that are set for the class
   std::vector<bool> bits_;
-  std::vector<int> shape_;
+  std::vector<int> shape_ = {1};
   std::string associated_;
-  int sparse_id_;
 
   /*--------------------------------------------------------*/
   // Setters for the different attributes of metadata
